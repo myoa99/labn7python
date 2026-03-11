@@ -1,0 +1,67 @@
+import math
+
+def read_angles(filename):
+    """
+    Читает файл и возвращает два угла в радианах.
+    Предполагается, что в файле две строки с углами в градусах.
+    """
+    angles = []
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        angle_deg = float(line)
+                        angles.append(angle_deg)
+                    except ValueError:
+                        print(f"Предупреждение: строка '{line}' не является числом и будет пропущена.")
+        if len(angles) != 2:
+            print("В файле должно быть ровно два числа.")
+            return None
+        # Переводим в радианы
+        alpha_deg, beta_deg = angles
+        alpha_rad = math.radians(alpha_deg)
+        beta_rad = math.radians(beta_deg)
+        return alpha_rad, beta_rad
+    except FileNotFoundError:
+        print(f"Ошибка: файл '{filename}' не найден.")
+        return None
+
+def compute_z1(alpha, beta):
+    """Вычисляет z1 по формуле."""
+    part1 = math.cos(alpha) - math.cos(beta)
+    part2 = (math.sin(alpha) - math.sin(beta)) ** 2
+    return part1 - part2
+
+def compute_z2(alpha, beta):
+    """Вычисляет z2 по формуле."""
+    delta = (alpha - beta) / 2
+    sin_delta = math.sin(delta)
+    numerator = math.cos(alpha) - math.cos(beta)
+    return -4 * (sin_delta ** 2) * (numerator / 2)
+
+def write_results(filename, alpha, beta, z1, z2):
+    """Записывает результаты в файл."""
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(f"Исходные углы:\n")
+        f.write(f"α = {math.degrees(alpha):.2f}° = {alpha:.4f} рад\n")
+        f.write(f"β = {math.degrees(beta):.2f}° = {beta:.4f} рад\n")
+        f.write("\nРезультаты вычислений:\n")
+        f.write(f"z1 = {z1:.10f}\n")
+        f.write(f"z2 = {z2:.10f}\n")
+
+def main():
+    input_file = "in.txt"
+    output_file = "out.txt"
+    angles = read_angles(input_file)
+    if angles is None:
+        return
+    alpha, beta = angles
+    z1 = compute_z1(alpha, beta)
+    z2 = compute_z2(alpha, beta)
+    write_results(output_file, alpha, beta, z1, z2)
+    print(f"Результаты записаны в файл '{output_file}'.")
+
+if __name__ == "__main__":
+    main()
